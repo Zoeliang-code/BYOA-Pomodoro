@@ -10,6 +10,14 @@ class PomodoroTimer {
         this.modeButtons = document.querySelectorAll('.mode');
         this.timerSound = document.getElementById('timerSound');
         
+        // Add error handling for audio
+        this.timerSound.addEventListener('error', (e) => {
+            console.error('Audio error:', e);
+        });
+        
+        // Try to load the audio
+        this.timerSound.load();
+        
         this.initializeEventListeners();
         this.updateDisplay();
     }
@@ -36,6 +44,18 @@ class PomodoroTimer {
             this.pauseTimer();
         } else {
             this.startTimer();
+            this.playSound();
+        }
+    }
+    
+    playSound() {
+        try {
+            this.timerSound.currentTime = 0; // Reset the sound to start
+            this.timerSound.play().catch(error => {
+                console.error('Error playing sound:', error);
+            });
+        } catch (error) {
+            console.error('Error with sound:', error);
         }
     }
     
@@ -47,7 +67,7 @@ class PomodoroTimer {
             this.updateDisplay();
             
             if (this.timeLeft <= 0) {
-                this.timerSound.play();
+                this.playSound();
                 this.resetTimer();
             }
         }, 1000);
